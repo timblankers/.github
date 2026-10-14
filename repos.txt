@@ -1,0 +1,8 @@
+# Repos that get the standard labels and settings (scripts/setup-github.sh --all).
+# One owner/repo per line; blank lines and # comments are ignored.
+timblankers/.github
+timblankers/app-template
+timblankers/rpi-infra
+timblankers/sourdough
+timblankers/daily-leaf
+timblankers/pixel-perfect
