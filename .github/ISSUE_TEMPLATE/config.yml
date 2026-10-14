@@ -1,0 +1,3 @@
+# Default for every repo without its own .github/ISSUE_TEMPLATE/ (repo copies win entirely).
+# Labels set by the templates must exist in each repo: run scripts/setup-github.sh.
+blank_issues_enabled: true
