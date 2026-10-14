@@ -1,0 +1,11 @@
+[
+  { "name": "feature",  "color": "1d76db", "description": "New or changed behaviour" },
+  { "name": "bug",      "color": "d73a4a", "description": "Something isn't working" },
+  { "name": "chore",    "color": "c5def5", "description": "Tooling, deps, refactors, infra" },
+  { "name": "docs",     "color": "0075ca", "description": "Documentation only" },
+  { "name": "decision", "color": "5319e7", "description": "Produces a decision record" },
+  { "name": "idea",     "color": "fbca04", "description": "Not committed to yet" },
+  { "name": "blocked",  "color": "b60205", "description": "Waiting on something outside this issue" },
+  { "name": "p1",       "color": "e99695", "description": "Do next" },
+  { "name": "p2",       "color": "f9d0c4", "description": "Do soon" }
+]
