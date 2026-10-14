@@ -35,6 +35,27 @@ mine, private ones included, that has no templates of its own. A repo with any v
 `config.yml` in its own `.github/ISSUE_TEMPLATE/` uses none of these, so delete repo copies rather
 than editing them. They stay Markdown: issue forms are still in public preview.
 
+## Shared CI and deploy for apps
+
+[`.github/workflows/app.yml`](.github/workflows/app.yml) implements app-template's decision 008.
+All jobs run on `ubuntu-24.04-arm`; runner minutes are billed to the calling repo.
+
+| Job | Runs on | Does |
+|---|---|---|
+| `check` | PRs, default branch | Postgres service → `npm ci` (Node from `.nvmrc`) → `npm run check` |
+| `image` | PRs, default branch | Build the arm64 image (GHA cache) → run it next to Postgres → seed → Playwright WebKit E2E against it → on the default branch, push that image as `ghcr.io/timblankers/<app>:<sha>` |
+| `deploy` | default branch, if `deploy: true` | Join the tailnet as ephemeral `tag:ci` → `ssh deploy@<pi> <app> <sha>` |
+
+What the workflow expects from an app (besides decision 008's image contract):
+
+- `.nvmrc`, `package-lock.json`, a `Dockerfile` at the root taking the `APP_VERSION` build arg.
+- `npm run check` uses `DATABASE_URL` (an empty `app_test` database) for tests that need Postgres.
+- `npm run db:seed` (optional) seeds `DATABASE_URL`; it runs after the app has migrated.
+- `npm run test:e2e` targets `BASE_URL` when set and then skips Playwright's `webServer`.
+
+Inputs: `app-name` (default: repo name), `postgres-version` (`18`), `seed-command`,
+`e2e-command`, `deploy` (`true`).
+
 ## Not here
 
 The app stack and app skeleton are not here; they live in
