@@ -8,13 +8,13 @@ the Renovate preset. See [`README.md`](README.md) for how other repos link to it
 
 ## Layout
 
-Grows phase by phase (see the milestones). Planned:
+Grows phase by phase (see the milestones):
 
 - `WORKFLOW.md`: how work is tracked (issues, milestones, labels, branch and PR flow).
 - `labels.json`, `scripts/setup-github.sh`, `repos.txt`: labels and repo settings, pushed to repos.
 - `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`: default templates for all repos.
-- `.github/workflows/`: reusable workflows (`on: workflow_call`), e.g. `app.yml`.
-- `default.json`: Renovate preset.
+- `.github/workflows/`: reusable workflows (`on: workflow_call`), e.g. `app.yml` (planned).
+- `default.json`: Renovate preset (planned).
 - `claude/skills/`: source of Claude Code skills.
 
 ## Rules

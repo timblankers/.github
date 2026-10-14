@@ -1,7 +1,7 @@
 # timblankers/.github
 
 The one place for everything that is the same across all my repos: how work is tracked, and
-shared automation. It is public; it holds no secrets or private details.
+shared automation. How work is tracked is in [`WORKFLOW.md`](WORKFLOW.md). It is public; it holds no secrets or private details.
 
 It links to the other repos in three ways:
 
