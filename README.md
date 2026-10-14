@@ -56,6 +56,38 @@ What the workflow expects from an app (besides decision 008's image contract):
 Inputs: `app-name` (default: repo name), `postgres-version` (`18`), `seed-command`,
 `e2e-command`, `deploy` (`true`).
 
+### The whole `ci.yml` an app needs
+
+```yaml
+# .github/workflows/ci.yml — CI and deploy via timblankers/.github (see its README)
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# The shared workflow can only lower these, so grant what it needs here.
+permissions:
+  contents: read
+  packages: write # push the image to GHCR
+
+# New pushes to a PR cancel its running CI; runs on main always finish.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  app:
+    uses: timblankers/.github/.github/workflows/app.yml@main
+    secrets: inherit # deploy secrets, see below
+    with:
+      deploy: false # until the app is set up on the Pi
+```
+
+Apps pin `@main`: a change here reaches every app on its next run, so test workflow changes by
+pointing one app's `ci.yml` at the branch (`app.yml@<branch>`) before merging.
+
 ## Not here
 
 The app stack and app skeleton are not here; they live in
