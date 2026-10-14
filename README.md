@@ -27,6 +27,14 @@ scripts/setup-github.sh --all --prune               # every repo in repos.txt, d
 
 New repo: add it to [`repos.txt`](repos.txt) and run the script. Needs `gh` (logged in) and `jq`.
 
+## Default templates
+
+[`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) (feature, bug, idea, decision) and
+[`.github/pull_request_template.md`](.github/pull_request_template.md) are used by every repo of
+mine, private ones included, that has no templates of its own. A repo with any valid template or
+`config.yml` in its own `.github/ISSUE_TEMPLATE/` uses none of these, so delete repo copies rather
+than editing them. They stay Markdown: issue forms are still in public preview.
+
 ## Not here
 
 The app stack and app skeleton are not here; they live in
