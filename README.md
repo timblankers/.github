@@ -42,9 +42,10 @@ All jobs run on `ubuntu-24.04-arm`; runner minutes are billed to the calling rep
 
 | Job | Runs on | Does |
 |---|---|---|
+| `conformance` | PRs, default branch | `scripts/check-conformance.sh` against the app (see [Conformance check](#conformance-check)) |
 | `check` | PRs, default branch | Postgres service → `npm ci` (Node from `.nvmrc`) → `npm run check` |
 | `image` | PRs, default branch | Build the arm64 image (GHA cache) → run it next to Postgres → seed → Playwright WebKit E2E against it → on the default branch, push that image as `ghcr.io/timblankers/<app>:<sha>` |
-| `deploy` | default branch, if `deploy: true` | Join the tailnet as ephemeral `tag:ci` → `ssh deploy@<pi> <app> <sha>` |
+| `deploy` | default branch, if `deploy: true` (after the other three pass) | Join the tailnet as ephemeral `tag:ci` → `ssh deploy@<pi> <app> <sha>` |
 
 What the workflow expects from an app (besides decision 008's image contract):
 
@@ -87,6 +88,40 @@ jobs:
 
 Apps pin `@main`: a change here reaches every app on its next run, so test workflow changes by
 pointing one app's `ci.yml` at the branch (`app.yml@<branch>`) before merging.
+
+## Conformance check
+
+[`scripts/check-conformance.sh`](scripts/check-conformance.sh) checks an app against
+app-template's [`STACK.md`](https://github.com/timblankers/app-template/blob/main/STACK.md). It
+prints `PASS <id> <message>` or `FAIL <id> <message>` per check (a FAIL message says what to
+change), then `<n> failed`, and exits 1 if any check failed. `app.yml` runs it as the
+`conformance` job, so CI fails on drift and `deploy` waits for it.
+
+Run it locally from an app's root (needs `bash`, `jq`, `gh` for the download):
+
+```bash
+gh api repos/timblankers/.github/contents/scripts/check-conformance.sh -H 'Accept: application/vnd.github.raw' | bash -s -- .
+```
+
+or from a checkout of this repo: `scripts/check-conformance.sh ../<app>`.
+
+| Id | Passes when | Source |
+|---|---|---|
+| `nvmrc-exact` | `.nvmrc` holds one exact Node version (`x.y.z`) | 002 |
+| `devengines-node` | `package.json` `devEngines.runtime` is `node` at the `.nvmrc` version, `onFail: "error"` | 002 |
+| `devengines-npm` | `devEngines.packageManager` is `npm` at an exact version, `onFail: "error"` | 002 |
+| `npmrc` | `.npmrc` has `min-release-age=1` and `engine-strict=true` | 002 |
+| `lockfile` | `package-lock.json` exists; no `bun.lock(b)`, `yarn.lock` or `pnpm-lock.yaml` | 002 |
+| `scripts` | `dev`, `build`, `start`, `typecheck`, `lint`, `format`, `format:check`, `knip`, `test`, `test:e2e`, `check` exist | 004 |
+| `no-plan-files` | no `PLAN.md`, `TODO.md`, `IDEAS.md` or `*-plan.md` (any case) outside `node_modules`, `.git`, `.claude` | [WORKFLOW.md](WORKFLOW.md) |
+| `claude-md` | `CLAUDE.md` exists | 007 |
+| `dockerfile` | `Dockerfile` has `ARG NODE_IMAGE=node:<.nvmrc version>-trixie-slim` (a `@sha256:` digest may follow) | 008 |
+| `healthz` | `app/routes/healthz.ts` exists | 008 |
+| `ci-shared` | a workflow in `.github/workflows/` calls `timblankers/.github/.github/workflows/app.yml` | this README |
+
+The ids are stable: tools (and a Claude skill) match on them. Change a check's id only together
+with its users. Numbers are app-template's
+[decision records](https://github.com/timblankers/app-template/tree/main/docs/decisions).
 
 ## Not here
 

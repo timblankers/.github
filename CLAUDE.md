@@ -13,7 +13,9 @@ Grows phase by phase (see the milestones):
 - `WORKFLOW.md`: how work is tracked (issues, milestones, labels, branch and PR flow).
 - `labels.json`, `scripts/setup-github.sh`, `repos.txt`: labels and repo settings, pushed to repos.
 - `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`: default templates for all repos.
-- `.github/workflows/`: reusable workflows (`on: workflow_call`), e.g. `app.yml` (planned).
+- `.github/workflows/`: reusable workflows (`on: workflow_call`): `app.yml`; `ci.yml` lints this repo.
+- `scripts/check-conformance.sh`: STACK.md drift check, run by `app.yml`. Its check ids are an
+  interface (a Claude skill matches on them): keep them stable.
 - `default.json`: Renovate preset (planned).
 - `claude/skills/`: source of Claude Code skills.
 
