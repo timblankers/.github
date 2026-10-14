@@ -14,7 +14,7 @@ Grows phase by phase (see the milestones):
 - `labels.json`, `scripts/setup-github.sh`, `repos.txt`: labels and repo settings, pushed to repos.
 - `.github/ISSUE_TEMPLATE/`, `.github/pull_request_template.md`: default templates for all repos.
 - `.github/workflows/`: reusable workflows (`on: workflow_call`), e.g. `app.yml` (planned).
-- `default.json`: Renovate preset (planned).
+- `default.json`: Renovate preset (`renovate.json` is this repo's own config, extending it).
 - `claude/skills/`: source of Claude Code skills.
 
 ## Rules

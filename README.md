@@ -88,6 +88,52 @@ jobs:
 Apps pin `@main`: a change here reaches every app on its next run, so test workflow changes by
 pointing one app's `ci.yml` at the branch (`app.yml@<branch>`) before merging.
 
+## Renovate preset
+
+[`default.json`](default.json) is the one Renovate config for all repos. A repo uses it with a
+`renovate.json` at its root:
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>timblankers/.github"]
+}
+```
+
+What it does:
+
+- `config:recommended`, plus a **weekly** schedule (early Monday, UTC) and a dependency dashboard
+  issue.
+- **Minor and patch updates in one PR**; majors get their own.
+- **`minimumReleaseAge: "1 day"`**, matching `.npmrc`'s `min-release-age=1` (decision 002), so
+  update PRs don't fail `npm ci`.
+- **GitHub Actions pinned by SHA** (with the version as a comment), except this repo's own
+  `app.yml@main`, which apps follow on purpose.
+- **The Dockerfile base image pinned by digest** (`ARG NODE_IMAGE=node:<x.y.z>-trixie-slim@sha256:…`,
+  decision 008).
+- **One Node.js PR** updates `.nvmrc`, the Dockerfile `NODE_IMAGE` and `devEngines.runtime`
+  together, and only to **LTS** releases (decision 002: no odd/Current majors). The Node release
+  waits 3 days so its Docker image exists by then; if the PR still misses the Dockerfile, the
+  `dockerfile` conformance check fails until Renovate adds it.
+  - **By hand in that PR**: set `devEngines.packageManager.version` to the npm bundled with the new
+    Node (the `npm` field in <https://nodejs.org/dist/index.json>; the PR body says so). Renovate
+    never bumps npm on its own: it would pick the latest standalone npm instead.
+  - With a Node **major**, also bump `@types/node`'s major (Renovate skips those).
+- **TypeScript stays on 6.0.x** until typescript-eslint supports 7 (decision 004). Remove that rule
+  when it does.
+
+CI here runs `renovate-config-validator` on the preset. Changing `default.json` changes every
+repo's next Renovate run.
+
+### Which repos use it
+
+Renovate runs (Mend Renovate GitHub App, "Only select repositories") on **app-template, .github and
+rpi-infra**. **sourdough, daily-leaf and pixel-perfect get it only once they're aligned with
+STACK.md** (Phase 4, `scripts/check-conformance.sh` passes): before that, its rules (Node LTS
+group, npm in `devEngines`, TypeScript 6.0) don't fit them, and the PRs would be noise. To add a
+repo: add `renovate.json` as above, then add the repo to the app's repository selection
+(github.com/settings/installations → Renovate → Configure).
+
 ## Not here
 
 The app stack and app skeleton are not here; they live in
