@@ -1,0 +1,8 @@
+# actionlint 1.7.12 doesn't know the job.workflow_* contexts yet; GitHub documents them for a
+# reusable workflow checking out its own repo:
+# https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#job-context
+# Drop this once actionlint supports them.
+paths:
+  .github/workflows/app.yml:
+    ignore:
+      - 'property "workflow_(repository|sha)" is not defined in object type'
