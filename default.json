@@ -1,0 +1,56 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Shared Renovate preset for timblankers repos. Extend it with \"extends\": [\"github>timblankers/.github\"]. See README.md.",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    "group:allNonMajor",
+    "schedule:weekly"
+  ],
+  "minimumReleaseAge": "1 day",
+  "packageRules": [
+    {
+      "description": "Pin the Dockerfile base image (ARG NODE_IMAGE) by digest (app-template decision 008).",
+      "matchManagers": ["dockerfile"],
+      "pinDigests": true
+    },
+    {
+      "description": "One Node.js PR updates .nvmrc, the Dockerfile NODE_IMAGE and devEngines.runtime together. Node versioning only offers LTS releases, so no odd/Current majors (decision 002). Declared after group:allNonMajor so Node stays out of that group.",
+      "matchDatasources": ["node-version", "docker"],
+      "matchPackageNames": ["node"],
+      "groupName": "Node.js",
+      "groupSlug": "node",
+      "prBodyNotes": [
+        "Set `devEngines.packageManager.version` in package.json to the npm bundled with this Node (the `npm` field for this version in https://nodejs.org/dist/index.json), or `npm ci` fails with EBADDEVENGINES (decision 002)."
+      ]
+    },
+    {
+      "description": "The node:<version>-trixie-slim image often appears a day or two after the Node release; wait longer for .nvmrc and devEngines so the Dockerfile lands in the same PR.",
+      "matchDatasources": ["node-version"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "description": "npm is the version bundled with Node (decision 002), not the latest standalone npm. It is bumped by hand in the Node.js PR.",
+      "matchDepTypes": ["devEngines.packageManager"],
+      "matchPackageNames": ["npm"],
+      "enabled": false
+    },
+    {
+      "description": "@types/node follows the Node major; bump its major by hand together with a Node major.",
+      "matchPackageNames": ["@types/node"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "TypeScript stays on 6.0.x until typescript-eslint supports 7 (app-template decision 004).",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "~6.0.0"
+    },
+    {
+      "description": "Apps call this repo's reusable workflow at @main on purpose (README.md); don't pin it to a SHA.",
+      "matchDepTypes": ["workflow"],
+      "matchPackageNames": ["timblankers/.github"],
+      "enabled": false
+    }
+  ]
+}
