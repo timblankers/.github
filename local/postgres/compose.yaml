@@ -1,0 +1,21 @@
+# One Postgres for all apps' local development and tests, laid out like the Pi: a role and a
+# database per app (app-template decision 010). Each app creates its own with `npm run db:setup`.
+# Start it once: `docker compose -f local/postgres/compose.yaml up -d` (from a clone of this repo).
+# Local only: the superuser password is public and the port is bound to localhost.
+name: local-postgres
+services:
+  postgres:
+    image: postgres:18 # same major as rpi-infra
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      retries: 15
+
+volumes:
+  data:

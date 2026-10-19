@@ -16,6 +16,7 @@ Grows phase by phase (see the milestones):
 - `.github/workflows/`: reusable workflows (`on: workflow_call`): `app.yml`; `ci.yml` lints this repo.
 - `scripts/check-conformance.sh`: STACK.md drift check, run by `app.yml`. Its check ids are an
   interface (a Claude skill matches on them): keep them stable.
+- `local/postgres/compose.yaml`: the shared local Postgres that all apps use (app-template decision 010).
 - `default.json`: Renovate preset (`renovate.json` is this repo's own config, extending it).
 - `claude/skills/`: source of Claude Code skills.
 

@@ -123,6 +123,20 @@ The ids are stable: tools (and a Claude skill) match on them. Change a check's i
 with its users. Numbers are app-template's
 [decision records](https://github.com/timblankers/app-template/tree/main/docs/decisions).
 
+## Shared local Postgres
+
+[`local/postgres/compose.yaml`](local/postgres/compose.yaml) runs one `postgres:18` for local
+development and tests of all apps, laid out like the Pi: one instance, a role and a database per
+app. Start it once from a clone of this repo; it restarts with Docker:
+
+```bash
+docker compose -f local/postgres/compose.yaml up -d
+```
+
+Each app then creates its own role and databases with `npm run db:setup`
+([app-template decision 010](https://github.com/timblankers/app-template/blob/main/docs/decisions/010-local-postgres.md)).
+It listens on `127.0.0.1:5432` only, and the superuser password (`postgres`) is not a secret.
+
 ## Renovate preset
 
 [`default.json`](default.json) is the one Renovate config for all repos. A repo uses it with a
