@@ -162,11 +162,9 @@ repo's next Renovate run.
 
 ### Which repos use it
 
-Renovate runs (Mend Renovate GitHub App, "Only select repositories") on **app-template, .github,
-rpi-infra and daily-leaf**. **sourdough and pixel-perfect get it only once they're aligned with
-STACK.md** (Phase 4, `scripts/check-conformance.sh` passes): before that, its rules (Node LTS
-group, npm in `devEngines`, TypeScript 6.0) don't fit them, and the PRs would be noise. To add a
-repo: add `renovate.json` as above, then add the repo to the app's repository selection
+Renovate runs (Mend Renovate GitHub App, "Only select repositories") on every repo in
+[`repos.txt`](repos.txt): **app-template, .github, rpi-infra, sourdough, daily-leaf and
+pixel-perfect**. To add a repo: add `renovate.json` as above, then add the repo to the app's repository selection
 (github.com/settings/installations → Renovate → Configure).
 
 ## Not here
