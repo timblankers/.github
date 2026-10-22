@@ -19,7 +19,7 @@ keywords = ["://"]
   [[rules.allowlists]]
   description = "Local hosts"
   regexTarget = "match"
-  regexes = ['''@(localhost|127\.0\.0\.1|\[::1\])([:/?#]|$)''']
+  regexes = ['''@(localhost|127\.0\.0\.1|\[::1\])([^A-Za-z0-9.-]|$)''']
 
   # Placeholders in docs and examples: <password>, ${PGPASSWORD}, password, YOUR-PASSWORD.
   [[rules.allowlists]]
