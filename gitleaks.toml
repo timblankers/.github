@@ -1,0 +1,27 @@
+# Default gitleaks config for every repo, used by .github/workflows/secrets.yml.
+# A repo's own .gitleaks.toml replaces it entirely (copy what it still needs from here). To accept
+# one finding instead, add its fingerprint to that repo's .gitleaksignore.
+title = "timblankers default"
+
+# gitleaks' built-in rules (API keys, tokens, private keys, ...).
+[extend]
+useDefault = true
+
+# The built-in rules skip passwords in URLs, the likeliest leak here (a real DATABASE_URL).
+[[rules]]
+id = "url-credentials"
+description = "Password in a connection URL (scheme://user:password@host)"
+regex = '''[a-z][a-z0-9+.-]{1,20}://[^\s:/@'"`]+:([^\s/@'"`]+)@[^\s/'"`]+'''
+secretGroup = 1
+keywords = ["://"]
+
+  # Local test databases: postgres://postgres:postgres@localhost..., postgres://app:app@localhost...
+  [[rules.allowlists]]
+  description = "Local hosts"
+  regexTarget = "match"
+  regexes = ['''@(localhost|127\.0\.0\.1|\[::1\])([:/?#]|$)''']
+
+  # Placeholders in docs and examples: <password>, ${PGPASSWORD}, password, YOUR-PASSWORD.
+  [[rules.allowlists]]
+  description = "Placeholders"
+  regexes = ['''^(<[^>]*>|\$\{?[A-Za-z_][A-Za-z0-9_]*\}?|password|YOUR[-_A-Z]*|x+|\*+)$''']

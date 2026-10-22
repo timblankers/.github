@@ -42,10 +42,11 @@ All jobs run on `ubuntu-24.04-arm`; runner minutes are billed to the calling rep
 
 | Job | Runs on | Does |
 |---|---|---|
+| `secrets` | PRs, default branch | gitleaks over the full git history (see [Secret scan](#secret-scan)) |
 | `conformance` | PRs, default branch | `scripts/check-conformance.sh` against the app (see [Conformance check](#conformance-check)) |
 | `check` | PRs, default branch | Postgres service → `npm ci` (Node from `.nvmrc`) → `npm run check` |
 | `image` | PRs, default branch | Build the arm64 image (GHA cache) → run it next to Postgres → seed → Playwright WebKit E2E against it → on the default branch, push that image as `ghcr.io/timblankers/<app>:<sha>` |
-| `deploy` | default branch, if `deploy: true` (after the other three pass) | Join the tailnet as ephemeral `tag:ci` → `ssh deploy@<pi> <app> <sha>` |
+| `deploy` | default branch, if `deploy: true` (after the other four pass) | Join the tailnet as ephemeral `tag:ci` → `ssh deploy@<pi> <app> <sha>` |
 
 What the workflow expects from an app (besides decision 008's image contract):
 
@@ -88,6 +89,44 @@ jobs:
 
 Apps pin `@main`: a change here reaches every app on its next run, so test workflow changes by
 pointing one app's `ci.yml` at the branch (`app.yml@<branch>`) before merging.
+
+## Secret scan
+
+GitHub secret scanning only covers public repos on the free plan, so every repo runs
+[gitleaks](https://github.com/gitleaks/gitleaks) in CI:
+[`.github/workflows/secrets.yml`](.github/workflows/secrets.yml) scans the repo's full git history
+(a few seconds here) and fails on any finding, with secrets redacted in the log. Apps get it as the
+`secrets` job of `app.yml` (`deploy` waits for it); other repos call it from their own `ci.yml`:
+
+```yaml
+# .github/workflows/ci.yml — secret scan via timblankers/.github (see its README)
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    uses: timblankers/.github/.github/workflows/secrets.yml@main
+```
+
+- **Rules**: [`gitleaks.toml`](gitleaks.toml): gitleaks' built-in rules plus `url-credentials`
+  (a password in `scheme://user:password@host`, e.g. a real `DATABASE_URL`). It allows local hosts
+  (`postgres://postgres:postgres@localhost…` in `.env.example`, tests and workflows) and
+  placeholders (`<password>`, `${VAR}`, `YOUR-…`).
+- **Per repo**: a `.gitleaks.toml` at the repo root replaces `gitleaks.toml` entirely. To accept
+  one finding, add its fingerprint (printed by the scan) to `.gitleaksignore`. A secret that was
+  pushed stays in the history: rotate it first, then ignore the old one.
+- **gitleaks itself** is the release binary at a fixed version, checked against a SHA-256 in the
+  workflow, not `gitleaks/gitleaks-action` (an org license and a JS runtime). Renovate doesn't
+  update it: bump `GITLEAKS_VERSION` and `GITLEAKS_SHA256` (from the release's
+  `checksums.txt`, `linux_arm64`) together.
+- **Locally**: `gitleaks git ../<repo> --config gitleaks.toml` from a checkout of this repo.
 
 ## Conformance check
 

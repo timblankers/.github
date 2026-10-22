@@ -1,8 +1,10 @@
-# actionlint 1.7.12 doesn't know the job.workflow_* contexts yet; GitHub documents them for a
-# reusable workflow checking out its own repo:
+# actionlint 1.7.12 doesn't know the job.workflow_* contexts or the $/ (self repository) syntax in
+# jobs.<id>.uses yet; GitHub documents both for a reusable workflow using files from its own repo:
 # https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#job-context
+# https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_iduses
 # Drop this once actionlint supports them.
 paths:
-  .github/workflows/app.yml:
+  .github/workflows/{app,secrets}.yml:
     ignore:
       - 'property "workflow_(repository|sha)" is not defined in object type'
+      - 'reusable workflow call "\$/\.github/workflows/[a-z]+\.yml" at "uses" is not following the format'
