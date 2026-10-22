@@ -35,6 +35,11 @@ setup_repo() {
   gh api -X PATCH "repos/$repo" -f squash_merge_commit_title=PR_TITLE \
     -f squash_merge_commit_message=PR_BODY >/dev/null
 
+  # Security: Dependabot alerts on, and actions must be pinned to a full commit SHA.
+  gh api -X PUT "repos/$repo/vulnerability-alerts" --silent
+  gh api -X PUT "repos/$repo/actions/permissions" -F enabled=true -f allowed_actions=all \
+    -F sha_pinning_required=true --silent
+
   echo "Done: $repo"
 }
 
