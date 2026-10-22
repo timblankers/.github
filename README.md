@@ -18,7 +18,8 @@ It links to the other repos in three ways:
 
 [`labels.json`](labels.json) is the fixed label set from [`WORKFLOW.md`](WORKFLOW.md).
 [`scripts/setup-github.sh`](scripts/setup-github.sh) applies it to a repo, together with the merge
-settings (squash only, PR title + body as the commit, delete branch on merge):
+settings (squash only, PR title + body as the commit, delete branch on merge) and the security
+settings (Dependabot alerts on, actions must be pinned to a full commit SHA):
 
 ```bash
 scripts/setup-github.sh timblankers/<repo>          # one repo
@@ -26,6 +27,9 @@ scripts/setup-github.sh --all --prune               # every repo in repos.txt, d
 ```
 
 New repo: add it to [`repos.txt`](repos.txt) and run the script. Needs `gh` (logged in) and `jq`.
+
+Not in the script: this repo's "Protect main" ruleset (PRs only, squash, CI must pass), set by hand
+because private repos on the free plan can't have rulesets.
 
 ## Default templates
 

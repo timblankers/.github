@@ -2,7 +2,7 @@
 
 How work is planned and tracked in every repo of mine (apps, infra, this one): GitHub issues and
 milestones, no plan files. The shared pieces live in this repo: the label set
-([`labels.json`](labels.json)), the script that applies labels and merge settings
+([`labels.json`](labels.json)), the script that applies labels, merge and security settings
 ([`scripts/setup-github.sh`](scripts/setup-github.sh)), and the default issue and PR templates
 ([`.github/`](.github/)). For apps, the stack is in
 [`app-template/STACK.md`](https://github.com/timblankers/app-template/blob/main/STACK.md).
