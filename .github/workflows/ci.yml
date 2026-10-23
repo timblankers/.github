@@ -1,4 +1,5 @@
-# This repo's own check: lint the shared workflows, scripts and Renovate preset every repo depends on.
+# This repo's own check: lint the shared workflows, scripts and Renovate preset every repo depends on,
+# and run the shared secret scan on this repo (which also tests secrets.yml in PRs).
 name: ci
 
 on:
@@ -31,3 +32,6 @@ jobs:
       # The preset every repo extends (default.json) and this repo's own config.
       - name: renovate-config-validator
         run: npx --yes --package renovate@44.155.2 -- renovate-config-validator --strict default.json renovate.json
+
+  secrets:
+    uses: ./.github/workflows/secrets.yml

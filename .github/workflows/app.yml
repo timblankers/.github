@@ -1,7 +1,7 @@
 # Shared CI and deploy for web apps: implements app-template's decision 008 (runtime & deploy
 # contract). Each app calls it from a small ci.yml (see README.md):
-#   PRs:            conformance + check + image (build, E2E against the image), no push, no deploy
-#   default branch: conformance + check + image + push ghcr.io/<owner>/<app>:<sha> + deploy to the Pi
+#   PRs:            secrets + conformance + check + image (build, E2E against the image), no push, no deploy
+#   default branch: secrets + conformance + check + image + push ghcr.io/<owner>/<app>:<sha> + deploy to the Pi
 # All jobs run on native arm64 runners, so the image tested is the image deployed.
 name: app
 
@@ -47,6 +47,13 @@ env:
   PGPASSWORD: postgres
 
 jobs:
+  # gitleaks over the full history (secrets.yml). $/ is this repo at this workflow's commit, so
+  # app.yml@<branch> tests both together.
+  secrets:
+    uses: $/.github/workflows/secrets.yml
+    permissions:
+      contents: read
+
   # Drift from app-template's STACK.md (scripts/check-conformance.sh). The script is checked out
   # from this repo at the same commit as this workflow, so app.yml@<branch> tests both together.
   conformance:
@@ -172,7 +179,7 @@ jobs:
         run: docker push "$IMAGE"
 
   deploy:
-    needs: [conformance, check, image]
+    needs: [secrets, conformance, check, image]
     if: inputs.deploy && github.event_name == 'push' && github.ref_name == github.event.repository.default_branch
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 10
