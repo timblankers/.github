@@ -59,7 +59,8 @@ An `idea` issue can stay type-less until it's picked up.
 4. **Merge**: squash merge. The issue closes and counts toward the milestone; the branch is
    deleted.
 
-Small doc fixes may be committed straight to `main` with `Closes #N` in the message.
+Every change goes through this flow, small doc fixes included: nothing is committed straight to
+`main`.
 
 Found something out of scope while working? Open an issue (usually `idea` or `bug`) instead of
 widening the PR or leaving a TODO comment.
